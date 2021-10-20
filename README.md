@@ -113,13 +113,6 @@ public interface Regex {
 
 接下来，我们会实现一些基本的`Regex`实现类，使用它们可以将任意正则表达式转换成一个`Regex`的实例。调用`Regex`的`match`方法，并传入待匹配的字符串，就能判断这个字符串是否与正则表达式匹配。
 
-```java
-Regex r = ...; //
-System.out.println()
-```
-
-
-
 ## 原子Regex
 
 下面实现两个基本的`Regex`，虽然它们只能实现简单的功能，但是后面将非常有用。
