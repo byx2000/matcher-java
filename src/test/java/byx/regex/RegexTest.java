@@ -250,6 +250,74 @@ public class RegexTest {
     }
 
     @Test
+    public void test21() throws RegexParseException {
+        Regex r = Regex.of("[0-9]");
+        assertTrue(r.match("0"));
+        assertTrue(r.match("5"));
+        assertTrue(r.match("9"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+    }
+
+    @Test
+    public void test22() throws RegexParseException {
+        Regex r = Regex.of("[abc]");
+        assertTrue(r.match("a"));
+        assertTrue(r.match("b"));
+        assertTrue(r.match("c"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("x"));
+    }
+
+    @Test
+    public void test23() throws RegexParseException {
+        Regex r = Regex.of("[a-zA-Z]");
+        assertTrue(r.match("a"));
+        assertTrue(r.match("x"));
+        assertTrue(r.match("z"));
+        assertTrue(r.match("A"));
+        assertTrue(r.match("X"));
+        assertTrue(r.match("Z"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("5"));
+        assertFalse(r.match("?"));
+    }
+
+    @Test
+    public void test24() throws RegexParseException {
+        Regex r = Regex.of("[_a-zA-Z][_0-9a-zA-Z]*");
+        assertTrue(r.match("_"));
+        assertTrue(r.match("_var"));
+        assertTrue(r.match("count"));
+        assertTrue(r.match("Add"));
+        assertTrue(r.match("_____"));
+        assertTrue(r.match("push123"));
+        assertTrue(r.match("abc123xXYy"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("123abc"));
+        assertFalse(r.match("dfg3fd fsgbsdf23"));
+    }
+
+    @Test
+    public void test25() throws RegexParseException {
+        // 匹配3的倍数
+        Regex r = Regex.of("[0369]*(([147][0369]*|[258][0369]*[258][0369]*)([147][0369]*[258][0369]*)*([258][0369]*|[147][0369]*[147][0369]*)|[258][0369]*[147][0369]*)*");
+
+        for (int i = 0; i <= 100000; ++i) {
+            if (i % 3 == 0) {
+                assertTrue(r.match(String.valueOf(i)));
+            } else {
+                assertFalse(r.match(String.valueOf(i)));
+            }
+        }
+
+        assertTrue(r.match("1306037620370620974"));
+        assertFalse(r.match("1306037620370620975"));
+        assertFalse(r.match("1306037620370620976"));
+        assertTrue(r.match("1306037620370620977"));
+    }
+
+    @Test
     public void testFileCases() throws Exception {
         for (int i = 1; i <= 11; ++i) {
             String inputFile = "regular" + i + ".in";

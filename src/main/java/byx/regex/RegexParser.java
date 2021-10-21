@@ -51,6 +51,8 @@ public class RegexParser {
             Regex r = parseExpr();
             read(')');
             return r;
+        } else if (peek() == '[') {
+            return parseRange();
         } else if (peek() == '.') {
             next();
             return any();
@@ -89,5 +91,26 @@ public class RegexParser {
             r = r.or(parseTerm());
         }
         return r;
+    }
+
+    private Regex parseRange() throws RegexParseException {
+        read('[');
+        Regex r = parseRangeItem();
+        while (!end() && peek() != ']') {
+            r = r.or(parseRangeItem());
+        }
+        read(']');
+        return r;
+    }
+
+    private Regex parseRangeItem() throws RegexParseException {
+        char c1 = next();
+        if (peek() == '-') {
+            next();
+            char c2 = next();
+            return range(c1, c2);
+        } else {
+            return ch(c1);
+        }
     }
 }

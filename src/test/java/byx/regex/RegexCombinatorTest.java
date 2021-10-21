@@ -7,16 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RegexCombinatorTest {
     @Test
-    public void test() {
-        Cursor cursor = new Cursor("hello", 0);
-        while (!cursor.end()) {
-            System.out.println(cursor);
-            System.out.println("current: " + cursor.current());
-            cursor = cursor.next();
-        }
-    }
-
-    @Test
     public void testCh() {
         Regex r = ch('a');
         assertTrue(r.match("a"));
@@ -33,6 +23,28 @@ public class RegexCombinatorTest {
         assertTrue(r.match("b"));
         assertFalse(r.match(""));
         assertFalse(r.match("xyz"));
+    }
+
+    @Test
+    public void testRange() {
+        Regex r = range('0', '9');
+        assertTrue(r.match("0"));
+        assertTrue(r.match("5"));
+        assertTrue(r.match("9"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+    }
+
+    @Test
+    public void testStr() {
+        Regex r = new Str("abc");
+        assertTrue(r.match("abc"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+        assertFalse(r.match("ab"));
+        assertFalse(r.match("ax"));
+        assertFalse(r.match("abx"));
+        assertFalse(r.match("abcx"));
     }
 
     @Test

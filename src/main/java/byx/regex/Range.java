@@ -22,4 +22,9 @@ public class Range implements Regex {
         }
         return Set.of(input.next());
     }
+
+    @Override
+    public String toString() {
+        return String.format("Range{c1: '%c', c2: '%c'}", c1, c2);
+    }
 }
