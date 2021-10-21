@@ -318,6 +318,36 @@ public class RegexTest {
     }
 
     @Test
+    public void test26() throws RegexParseException {
+        Regex r = Regex.of("\\.");
+        assertTrue(r.match("."));
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+
+        r = Regex.of("\\\\");
+        assertTrue(r.match("\\"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+    }
+
+    @Test
+    public void test27() throws RegexParseException {
+        Regex r = Regex.of("\\**");
+        assertTrue(r.match(""));
+        assertTrue(r.match("*"));
+        assertTrue(r.match("*****"));
+
+        r = Regex.of("(\\(\\)|\\[\\])+");
+        assertTrue(r.match("()"));
+        assertTrue(r.match("[]"));
+        assertTrue(r.match("()[][]()()[]"));
+        assertTrue(r.match("[][]()()()[][]()"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("(())"));
+        assertFalse(r.match("[)"));
+    }
+
+    @Test
     public void testFileCases() throws Exception {
         for (int i = 1; i <= 11; ++i) {
             String inputFile = "regular" + i + ".in";

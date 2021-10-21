@@ -56,6 +56,9 @@ public class RegexParser {
         } else if (peek() == '.') {
             next();
             return any();
+        } else if (peek() == '\\') {
+            next();
+            return ch(next());
         } else {
             return ch(next());
         }

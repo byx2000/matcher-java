@@ -82,4 +82,16 @@ public class RegexCombinatorTest {
         assertFalse(r.match("aaab"));
         assertFalse(r.match("aaabaaaa"));
     }
+
+    @Test
+    public void testOneOrMore() {
+        Regex r = ch('a').oneOrMore();
+        assertTrue(r.match("a"));
+        assertTrue(r.match("aaaaa"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("b"));
+        assertFalse(r.match("bbbb"));
+        assertFalse(r.match("aaab"));
+        assertFalse(r.match("aaabaaaa"));
+    }
 }
