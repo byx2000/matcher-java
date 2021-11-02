@@ -72,6 +72,30 @@ public class RegexCombinatorTest {
     }
 
     @Test
+    public void testRepeat1() {
+        Regex r = ch('a').repeat(3, 5);
+        assertTrue(r.match("aaa"));
+        assertTrue(r.match("aaaa"));
+        assertTrue(r.match("aaaaa"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+        assertFalse(r.match("aa"));
+        assertFalse(r.match("aaaaaa"));
+        assertFalse(r.match("aaaaaaa"));
+    }
+
+    @Test
+    public void testRepeat2() {
+        Regex r = ch('a').repeat(3);
+        assertTrue(r.match("aaa"));
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+        assertFalse(r.match("aa"));
+        assertFalse(r.match("aaaa"));
+        assertFalse(r.match("aaaaa"));
+    }
+
+    @Test
     public void testZeroOrMore() {
         Regex r = ch('a').zeroOrMore();
         assertTrue(r.match(""));

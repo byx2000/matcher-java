@@ -25,6 +25,14 @@ public interface Regex {
         return new Range(c1, c2);
     }
 
+    default Regex repeat(int minTimes, int maxTimes) {
+        return new Repeat(this, minTimes, maxTimes);
+    }
+
+    default Regex repeat(int times) {
+        return repeat(times, times);
+    }
+
     static Regex str(String prefix) {
         return new Str(prefix);
     }
@@ -38,10 +46,10 @@ public interface Regex {
     }
 
     default Regex zeroOrMore() {
-        return new ZeroOrMore(this);
+        return repeat(0, -1);
     }
 
     default Regex oneOrMore() {
-        return new OneOrMore(this);
+        return repeat(1, -1);
     }
 }
