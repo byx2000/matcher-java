@@ -350,8 +350,8 @@ public class RegexTest {
     @Test
     public void test28() throws RegexParseException {
         Regex r = Regex.of("(a*)*");
-        assertTrue(r.match("a".repeat(10000)));
-        assertFalse(r.match("a".repeat(10000) + "b"));
+        assertTrue(r.match("a".repeat(1000)));
+        assertFalse(r.match("a".repeat(1000) + "b"));
     }
 
     @Test
