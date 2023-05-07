@@ -356,6 +356,7 @@ public class RegexTest {
 
     @Test
     public void testFileCases() throws Exception {
+        // 测试数据来源：https://loj.ac/p/118
         for (int i = 1; i <= 11; ++i) {
             String inputFile = "regular" + i + ".in";
             String outputFile = "./regular" + i + ".out";

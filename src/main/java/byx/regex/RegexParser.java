@@ -2,118 +2,116 @@ package byx.regex;
 
 import static byx.regex.Regex.*;
 
+/**
+ * 将正则表达式字符串解析成Regex
+ */
 public class RegexParser {
-    private final String expr;
-    private int index;
-
-    public RegexParser(String expr) {
-        this.expr = expr;
-    }
-
-    private void init() {
-        index = 0;
-    }
-
-    private char peek() {
-        return expr.charAt(index);
-    }
-
-    private char next() {
-        return expr.charAt(index++);
-    }
-
-    private void read(char c) throws RegexParseException {
-        if (c != next()) {
-            throw new RegexParseException("expected: " + c);
-        }
-    }
-
-    private boolean end() {
-        return index == expr.length();
-    }
-
-    public Regex parse() throws RegexParseException {
-        init();
+    public static Regex parse(String expr) throws RegexParseException {
         try {
-            return parseExpr();
+            return parseExpr(new Cursor(expr, 0)).regex;
         } catch (RegexParseException e) {
             throw e;
         } catch (Exception e) {
-            throw new RegexParseException("unknown error: " + e.getMessage());
+            throw new RegexParseException("unknown error: " + e.getMessage(), e);
         }
+    }
 
+    private static class ParseResult {
+        private final Regex regex;
+        private final Cursor remain;
+
+        private ParseResult(Regex regex, Cursor remain) {
+            this.regex = regex;
+            this.remain = remain;
+        }
+    }
+
+    private static Cursor read(Cursor cursor, char c) {
+        if (cursor.end() || cursor.current() != c) {
+            throw new RegexParseException("expected: " + c);
+        }
+        return cursor.next();
     }
 
     // elem = char | (expr)
-    private Regex parseElem() throws RegexParseException {
-        if (peek() == '(') {
-            next();
-            Regex r = parseExpr();
-            read(')');
-            return r;
-        } else if (peek() == '[') {
-            return parseRange();
-        } else if (peek() == '.') {
-            next();
-            return any();
-        } else if (peek() == '\\') {
-            next();
-            return ch(next());
+    private static ParseResult parseElem(Cursor cursor) {
+        if (cursor.current() == '(') {
+            ParseResult r = parseExpr(cursor.next());
+            return new ParseResult(r.regex, read(r.remain, ')'));
+        } else if (cursor.current() == '[') {
+            return parseRange(cursor);
+        } else if (cursor.current() == '.') {
+            return new ParseResult(any(), cursor.next());
+        } else if (cursor.current() == '\\') {
+            cursor = cursor.next();
+            return new ParseResult(ch(cursor.current()), cursor.next());
         } else {
-            return ch(next());
+            return new ParseResult(ch(cursor.current()), cursor.next());
         }
     }
 
     // factor = elem* | elem+ | elem
-    private Regex parseFactor() throws RegexParseException {
-        Regex r = parseElem();
-        if (!end() && peek() == '*') {
-            r = r.zeroOrMore();
-            next();
-        } else if (!end() && peek() == '+') {
-            r = r.oneOrMore();
-            next();
+    private static ParseResult parseFactor(Cursor cursor) {
+        ParseResult r = parseElem(cursor);
+        Regex regex = r.regex;
+        cursor = r.remain;
+
+        if (!cursor.end() && cursor.current() == '*') {
+            regex = regex.many();
+            cursor = cursor.next();
+        } else if (!cursor.end() && cursor.current() == '+') {
+            regex = regex.many1();
+            cursor = cursor.next();
         }
-        return r;
+        return new ParseResult(regex, cursor);
     }
 
     // term = factor factor ... factor
-    private Regex parseTerm() throws RegexParseException {
-        Regex r = parseFactor();
-        while (!end() && peek() != ')' && peek() != '|') {
-            r = r.concat(parseFactor());
+    private static ParseResult parseTerm(Cursor cursor) {
+        ParseResult r = parseFactor(cursor);
+        Regex regex = r.regex;
+        cursor = r.remain;
+        while (!cursor.end() && cursor.current() != ')' && cursor.current() != '|') {
+            ParseResult rr = parseFactor(cursor);
+            regex = regex.concat(rr.regex);
+            cursor = rr.remain;
         }
-        return r;
+        return new ParseResult(regex, cursor);
     }
 
     // expr = term|term|...|term
-    private Regex parseExpr() throws RegexParseException {
-        Regex r = parseTerm();
-        while (!end() && peek() == '|') {
-            next();
-            r = r.or(parseTerm());
+    private static ParseResult parseExpr(Cursor cursor) {
+        ParseResult r = parseTerm(cursor);
+        Regex regex = r.regex;
+        cursor = r.remain;
+        while (!cursor.end() && cursor.current() == '|') {
+            ParseResult rr = parseTerm(cursor.next());
+            regex = regex.or(rr.regex);
+            cursor = rr.remain;
         }
-        return r;
+        return new ParseResult(regex, cursor);
     }
 
-    private Regex parseRange() throws RegexParseException {
-        read('[');
-        Regex r = parseRangeItem();
-        while (!end() && peek() != ']') {
-            r = r.or(parseRangeItem());
+    private static ParseResult parseRange(Cursor cursor) {
+        ParseResult r = parseRangeItem(read(cursor, '['));
+        Regex regex = r.regex;
+        cursor = r.remain;
+        while (!cursor.end() && cursor.current() != ']') {
+            ParseResult rr = parseRangeItem(cursor);
+            regex = regex.or(rr.regex);
+            cursor = rr.remain;
         }
-        read(']');
-        return r;
+        return new ParseResult(regex, read(cursor, ']'));
     }
 
-    private Regex parseRangeItem() throws RegexParseException {
-        char c1 = next();
-        if (peek() == '-') {
-            next();
-            char c2 = next();
-            return range(c1, c2);
+    private static ParseResult parseRangeItem(Cursor cursor) {
+        char c1 = cursor.current();
+        cursor = cursor.next();
+        if (cursor.current() == '-') {
+            char c2 = cursor.next().current();
+            return new ParseResult(range(c1, c2), cursor.next());
         } else {
-            return ch(c1);
+            return new ParseResult(ch(c1), cursor);
         }
     }
 }

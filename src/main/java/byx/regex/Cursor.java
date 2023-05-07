@@ -2,23 +2,40 @@ package byx.regex;
 
 import java.util.Objects;
 
-public class Cursor {
+/**
+ * 封装当前解析位置
+ */
+public final class Cursor {
     private final String input;
     private final int index;
 
+    /**
+     * 构造Cursor
+     * @param input 输入字符串
+     * @param index 下标
+     */
     public Cursor(String input, int index) {
         this.input = input;
         this.index = index;
     }
 
+    /**
+     * 判断是否到达输入末尾
+     */
     public boolean end() {
         return index == input.length();
     }
 
+    /**
+     * 获取当前光标指向的字符
+     */
     public char current() {
         return input.charAt(index);
     }
 
+    /**
+     * 返回向前移动一个位置的光标
+     */
     public Cursor next() {
         return new Cursor(input, index + 1);
     }

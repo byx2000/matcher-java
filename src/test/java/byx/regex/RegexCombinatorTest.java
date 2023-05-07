@@ -37,7 +37,7 @@ public class RegexCombinatorTest {
 
     @Test
     public void testStr() {
-        Regex r = new Str("abc");
+        Regex r = str("abc");
         assertTrue(r.match("abc"));
         assertFalse(r.match(""));
         assertFalse(r.match("a"));
@@ -96,8 +96,8 @@ public class RegexCombinatorTest {
     }
 
     @Test
-    public void testZeroOrMore() {
-        Regex r = ch('a').zeroOrMore();
+    public void testMany() {
+        Regex r = ch('a').many();
         assertTrue(r.match(""));
         assertTrue(r.match("a"));
         assertTrue(r.match("aaaaa"));
@@ -108,8 +108,8 @@ public class RegexCombinatorTest {
     }
 
     @Test
-    public void testOneOrMore() {
-        Regex r = ch('a').oneOrMore();
+    public void testMany1() {
+        Regex r = ch('a').many1();
         assertTrue(r.match("a"));
         assertTrue(r.match("aaaaa"));
         assertFalse(r.match(""));
