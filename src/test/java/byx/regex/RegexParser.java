@@ -6,13 +6,14 @@ import static byx.regex.Regex.*;
  * 将正则表达式字符串解析成Regex
  */
 public class RegexParser {
-    public static Regex parse(String expr) throws RegexParseException {
+    public static Regex parse(String expr) {
         try {
             return parseExpr(new Cursor(expr, 0)).regex;
-        } catch (RegexParseException e) {
+        }
+        catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RegexParseException("unknown error: " + e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -28,7 +29,7 @@ public class RegexParser {
 
     private static Cursor read(Cursor cursor, char c) {
         if (cursor.end() || cursor.current() != c) {
-            throw new RegexParseException("expected: " + c);
+            throw new RuntimeException("expected: " + c);
         }
         return cursor.next();
     }

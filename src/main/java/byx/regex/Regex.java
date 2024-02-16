@@ -23,14 +23,6 @@ public interface Regex {
     }
 
     /**
-     * 从字符串构造Regex
-     * @param expr 表达式
-     */
-    static Regex of(String expr) throws RegexParseException {
-        return RegexParser.parse(expr);
-    }
-
-    /**
      * 匹配任意单个字符
      */
     static Regex any() {

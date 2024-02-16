@@ -10,14 +10,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RegexTest {
     @Test
-    public void test1() throws RegexParseException {
-        Regex r = Regex.of("a");
+    public void test1() {
+        Regex r = RegexParser.parse("a");
         assertTrue(r.match("a"));
         assertFalse(r.match(""));
         assertFalse(r.match("b"));
         assertFalse(r.match("aa"));
 
-        r = Regex.of("(a)");
+        r = RegexParser.parse("(a)");
         assertTrue(r.match("a"));
         assertFalse(r.match(""));
         assertFalse(r.match("b"));
@@ -25,8 +25,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test2() throws RegexParseException {
-        Regex r = Regex.of(".");
+    public void test2() {
+        Regex r = RegexParser.parse(".");
         assertTrue(r.match("a"));
         assertTrue(r.match("b"));
         assertTrue(r.match(" "));
@@ -34,8 +34,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test3() throws RegexParseException {
-        Regex r = Regex.of("a*");
+    public void test3() {
+        Regex r = RegexParser.parse("a*");
         assertTrue(r.match(""));
         assertTrue(r.match("a"));
         assertTrue(r.match("aaaaa"));
@@ -44,16 +44,16 @@ public class RegexTest {
     }
 
     @Test
-    public void test4() throws RegexParseException {
-        Regex r = Regex.of("a+");
+    public void test4() {
+        Regex r = RegexParser.parse("a+");
         assertTrue(r.match("a"));
         assertTrue(r.match("aaaaa"));
         assertFalse(r.match(""));
     }
 
     @Test
-    public void test5() throws RegexParseException {
-        Regex r = Regex.of("ab");
+    public void test5() {
+        Regex r = RegexParser.parse("ab");
         assertTrue(r.match("ab"));
         assertFalse(r.match(""));
         assertFalse(r.match("a"));
@@ -63,8 +63,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test6() throws RegexParseException {
-        Regex r = Regex.of("apple");
+    public void test6() {
+        Regex r = RegexParser.parse("apple");
         assertTrue(r.match("apple"));
         assertFalse(r.match(""));
         assertFalse(r.match("a"));
@@ -75,8 +75,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test7() throws RegexParseException {
-        Regex r = Regex.of("a|b");
+    public void test7() {
+        Regex r = RegexParser.parse("a|b");
         assertTrue(r.match("a"));
         assertTrue(r.match("b"));
         assertFalse(r.match(""));
@@ -86,8 +86,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test8() throws RegexParseException {
-        Regex r = Regex.of("a|b|cd|e");
+    public void test8() {
+        Regex r = RegexParser.parse("a|b|cd|e");
         assertTrue(r.match("a"));
         assertTrue(r.match("b"));
         assertTrue(r.match("cd"));
@@ -102,8 +102,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test9() throws RegexParseException {
-        Regex r = Regex.of("(a|b)*");
+    public void test9() {
+        Regex r = RegexParser.parse("(a|b)*");
         assertTrue(r.match(""));
         assertTrue(r.match("a"));
         assertTrue(r.match("b"));
@@ -121,8 +121,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test10() throws RegexParseException {
-        Regex r = Regex.of("(a|b)+");
+    public void test10() {
+        Regex r = RegexParser.parse("(a|b)+");
         assertTrue(r.match("a"));
         assertTrue(r.match("b"));
         assertTrue(r.match("aa"));
@@ -140,8 +140,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test11() throws RegexParseException {
-        Regex r = Regex.of("(ab)*");
+    public void test11() {
+        Regex r = RegexParser.parse("(ab)*");
         assertTrue(r.match(""));
         assertTrue(r.match("ab"));
         assertTrue(r.match("ababababababababab"));
@@ -153,8 +153,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test12() throws RegexParseException {
-        Regex r = Regex.of("(a|ab)c");
+    public void test12() {
+        Regex r = RegexParser.parse("(a|ab)c");
         assertTrue(r.match("abc"));
         assertTrue(r.match("ac"));
         assertFalse(r.match("ab"));
@@ -164,8 +164,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test13() throws RegexParseException {
-        Regex r = Regex.of("(a*)*");
+    public void test13() {
+        Regex r = RegexParser.parse("(a*)*");
         assertTrue(r.match(""));
         assertTrue(r.match("a"));
         assertTrue(r.match("aaaaaaaaaaaaa"));
@@ -175,8 +175,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test14() throws RegexParseException {
-        Regex r = Regex.of("(a*)+");
+    public void test14() {
+        Regex r = RegexParser.parse("(a*)+");
         assertTrue(r.match(""));
         assertTrue(r.match("a"));
         assertTrue(r.match("aaaaaaaaaaaaa"));
@@ -186,8 +186,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test15() throws RegexParseException {
-        Regex r = Regex.of("(0|1(01*0)*1)*");
+    public void test15() {
+        Regex r = RegexParser.parse("(0|1(01*0)*1)*");
         assertTrue(r.match("0"));
         assertFalse(r.match("1"));
         assertFalse(r.match("10"));
@@ -208,37 +208,37 @@ public class RegexTest {
     }
 
     @Test
-    public void test16() throws RegexParseException {
-        Regex r = Regex.of("a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    public void test16() {
+        Regex r = RegexParser.parse("a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         assertTrue(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         assertFalse(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
     }
 
     @Test
-    public void test17() throws RegexParseException {
-        Regex r = Regex.of("(((a*)*)*)*");
+    public void test17() {
+        Regex r = RegexParser.parse("(((a*)*)*)*");
         assertTrue(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         assertFalse(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"));
         assertFalse(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
     }
 
     @Test
-    public void test18() throws RegexParseException {
-        Regex r = Regex.of("X(.+)+X");
+    public void test18() {
+        Regex r = RegexParser.parse("X(.+)+X");
         assertTrue(r.match("X==============================================X"));
         assertFalse(r.match("==XX=============================================="));
     }
 
     @Test
-    public void test19() throws RegexParseException {
-        Regex r = Regex.of("((0|1)+)+b");
+    public void test19() {
+        Regex r = RegexParser.parse("((0|1)+)+b");
         assertFalse(r.match("10101010110101001100101010101010101010101010101010000"));
         assertTrue(r.match("10101010110101001100101010101010101010101010101010000b"));
     }
 
     @Test
-    public void test20() throws RegexParseException {
-        Regex r = Regex.of("(.*)adidas(.*)");
+    public void test20() {
+        Regex r = RegexParser.parse("(.*)adidas(.*)");
         assertTrue(r.match("adidas"));
         assertTrue(r.match("adidasxxxxxxx"));
         assertTrue(r.match("yyyyyyyadidas"));
@@ -250,8 +250,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test21() throws RegexParseException {
-        Regex r = Regex.of("[0-9]");
+    public void test21() {
+        Regex r = RegexParser.parse("[0-9]");
         assertTrue(r.match("0"));
         assertTrue(r.match("5"));
         assertTrue(r.match("9"));
@@ -260,8 +260,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test22() throws RegexParseException {
-        Regex r = Regex.of("[abc]");
+    public void test22() {
+        Regex r = RegexParser.parse("[abc]");
         assertTrue(r.match("a"));
         assertTrue(r.match("b"));
         assertTrue(r.match("c"));
@@ -270,8 +270,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test23() throws RegexParseException {
-        Regex r = Regex.of("[a-zA-Z]");
+    public void test23() {
+        Regex r = RegexParser.parse("[a-zA-Z]");
         assertTrue(r.match("a"));
         assertTrue(r.match("x"));
         assertTrue(r.match("z"));
@@ -284,8 +284,8 @@ public class RegexTest {
     }
 
     @Test
-    public void test24() throws RegexParseException {
-        Regex r = Regex.of("[_a-zA-Z][_0-9a-zA-Z]*");
+    public void test24() {
+        Regex r = RegexParser.parse("[_a-zA-Z][_0-9a-zA-Z]*");
         assertTrue(r.match("_"));
         assertTrue(r.match("_var"));
         assertTrue(r.match("count"));
@@ -299,9 +299,9 @@ public class RegexTest {
     }
 
     @Test
-    public void test25() throws RegexParseException {
+    public void test25() {
         // 匹配3的倍数
-        Regex r = Regex.of("[0369]*(([147][0369]*|[258][0369]*[258][0369]*)([147][0369]*[258][0369]*)*([258][0369]*|[147][0369]*[147][0369]*)|[258][0369]*[147][0369]*)*");
+        Regex r = RegexParser.parse("[0369]*(([147][0369]*|[258][0369]*[258][0369]*)([147][0369]*[258][0369]*)*([258][0369]*|[147][0369]*[147][0369]*)|[258][0369]*[147][0369]*)*");
 
         for (int i = 0; i <= 100000; ++i) {
             if (i % 3 == 0) {
@@ -318,26 +318,26 @@ public class RegexTest {
     }
 
     @Test
-    public void test26() throws RegexParseException {
-        Regex r = Regex.of("\\.");
+    public void test26() {
+        Regex r = RegexParser.parse("\\.");
         assertTrue(r.match("."));
         assertFalse(r.match(""));
         assertFalse(r.match("a"));
 
-        r = Regex.of("\\\\");
+        r = RegexParser.parse("\\\\");
         assertTrue(r.match("\\"));
         assertFalse(r.match(""));
         assertFalse(r.match("a"));
     }
 
     @Test
-    public void test27() throws RegexParseException {
-        Regex r = Regex.of("\\**");
+    public void test27() {
+        Regex r = RegexParser.parse("\\**");
         assertTrue(r.match(""));
         assertTrue(r.match("*"));
         assertTrue(r.match("*****"));
 
-        r = Regex.of("(\\(\\)|\\[\\])+");
+        r = RegexParser.parse("(\\(\\)|\\[\\])+");
         assertTrue(r.match("()"));
         assertTrue(r.match("[]"));
         assertTrue(r.match("()[][]()()[]"));
@@ -348,14 +348,14 @@ public class RegexTest {
     }
 
     @Test
-    public void test28() throws RegexParseException {
-        Regex r = Regex.of("(a*)*");
+    public void test28() {
+        Regex r = RegexParser.parse("(a*)*");
         assertTrue(r.match("a".repeat(1000)));
         assertFalse(r.match("a".repeat(1000) + "b"));
     }
 
     @Test
-    public void testFileCases() throws Exception {
+    public void testFileCases() {
         // 测试数据来源：https://loj.ac/p/118
         for (int i = 1; i <= 11; ++i) {
             String inputFile = "regular" + i + ".in";
@@ -372,7 +372,7 @@ public class RegexTest {
                 System.out.println("ans: " + ans);
                 System.out.println("==============================");
 
-                Regex r = Regex.of(expr);
+                Regex r = RegexParser.parse(expr);
                 if ("Yes".equals(ans)) {
                     assertTrue(r.match(str));
                 } else {
