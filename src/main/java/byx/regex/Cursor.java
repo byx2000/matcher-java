@@ -40,6 +40,20 @@ public final class Cursor {
         return new Cursor(input, index + 1);
     }
 
+    /**
+     * 获取输入字符串
+     */
+    public String input() {
+        return input;
+    }
+
+    /**
+     * 获取当前索引
+     */
+    public int index() {
+        return index;
+    }
+
     @Override
     public String toString() {
         return String.format("Cursor{parsed: '%s', remain: '%s'}",

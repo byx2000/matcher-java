@@ -11,8 +11,7 @@ public class RegexParser {
     public static Regex parse(String expr) {
         try {
             return parseExpr(expr, new AtomicInteger(0));
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             throw new RuntimeException("Unknown parse error", e);
@@ -40,7 +39,7 @@ public class RegexParser {
     private static Regex parseTerm(String expr, AtomicInteger index) {
         Regex r = parseFactor(expr, index);
         while (index.get() < expr.length() && expr.charAt(index.get()) != ')' && expr.charAt(index.get()) != '|') {
-            r = r.concat(parseFactor(expr, index));
+            r = r.and(parseFactor(expr, index));
         }
         return r;
     }

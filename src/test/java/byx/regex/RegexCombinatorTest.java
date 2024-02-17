@@ -17,6 +17,27 @@ public class RegexCombinatorTest {
     }
 
     @Test
+    public void testChs1() {
+        Regex r = chs('a', 'b', 'c');
+        assertTrue(r.match("a"));
+        assertTrue(r.match("b"));
+        assertTrue(r.match("c"));
+        assertFalse(r.match("d"));
+        assertFalse(r.match("1"));
+    }
+
+    @Test
+    public void testChs2() {
+        Character[] arr = {'a', 'b', 'c'};
+        Regex r = chs(arr);
+        assertTrue(r.match("a"));
+        assertTrue(r.match("b"));
+        assertTrue(r.match("c"));
+        assertFalse(r.match("d"));
+        assertFalse(r.match("1"));
+    }
+
+    @Test
     public void testAny() {
         Regex r = any();
         assertTrue(r.match("a"));
@@ -36,6 +57,13 @@ public class RegexCombinatorTest {
     }
 
     @Test
+    public void testNot() {
+        Regex r = not('a');
+        assertTrue(r.match("b"));
+        assertFalse(r.match("a"));
+    }
+
+    @Test
     public void testStr() {
         Regex r = str("abc");
         assertTrue(r.match("abc"));
@@ -49,7 +77,7 @@ public class RegexCombinatorTest {
 
     @Test
     public void testConcat() {
-        Regex r = ch('a').concat(ch('b'));
+        Regex r = ch('a').and(ch('b'));
         assertTrue(r.match("ab"));
         assertFalse(r.match("a"));
         assertFalse(r.match("abc"));
@@ -117,5 +145,27 @@ public class RegexCombinatorTest {
         assertFalse(r.match("bbbb"));
         assertFalse(r.match("aaab"));
         assertFalse(r.match("aaabaaaa"));
+    }
+
+    @Test
+    public void testFlatMap1() {
+        Regex r = not(' ').many1().flatMap(s -> ch(' ').and(str("xxx ")).and(str(s)));
+        assertTrue(r.match("m xxx m"));
+        assertTrue(r.match("aaa xxx aaa"));
+        assertTrue(r.match("bbbb xxx bbbb"));
+        assertFalse(r.match("aaa xxx bbb"));
+        assertFalse(r.match("aaaa xxx aaa"));
+        assertFalse(r.match("aaa xxx aaaa"));
+    }
+
+    @Test
+    public void testFlatMap2() {
+        Regex r = any().many1().flatMap(s -> any().repeat(s.length()));
+        assertTrue(r.match("aaabbb"));
+        assertTrue(r.match("aaaabbbb"));
+        assertTrue(r.match("xxxxxyyyyy"));
+        assertFalse(r.match("aaabbbb"));
+        assertFalse(r.match("xxxxyyy"));
+        assertFalse(r.match("mmm"));
     }
 }

@@ -1,6 +1,9 @@
 package byx.regex;
 
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * 解析器组合子
@@ -26,12 +29,7 @@ public interface Regex {
      * 匹配任意单个字符
      */
     static Regex any() {
-        return cursor -> {
-            if (cursor.end()) {
-                return Collections.emptySet();
-            }
-            return Set.of(cursor.next());
-        };
+        return ch(c -> true);
     }
 
     /**
@@ -39,12 +37,24 @@ public interface Regex {
      * @param c c
      */
     static Regex ch(char c) {
-        return cursor -> {
-            if (cursor.end() || cursor.current() != c) {
-                return Collections.emptySet();
-            }
-            return Set.of(cursor.next());
-        };
+        return ch(ch -> ch == c);
+    }
+
+    /**
+     * 匹配指定字符集内的字符
+     * @param chs 字符集
+     */
+    static Regex chs(Character... chs) {
+        Set<Character> set = Arrays.stream(chs).collect(Collectors.toSet());
+        return ch(set::contains);
+    }
+
+    /**
+     * 匹配不等于指定字符c的字符
+     * @param c c
+     */
+    static Regex not(char c) {
+        return ch(ch -> ch != c);
     }
 
     /**
@@ -53,12 +63,16 @@ public interface Regex {
      * @param c2 c2
      */
     static Regex range(char c1, char c2) {
+        return ch(c -> (c - c1) * (c - c2) <= 0);
+    }
+
+    /**
+     * 匹配满足条件的单个字符
+     * @param predicate 判断字符是否满足条件
+     */
+    static Regex ch(Predicate<Character> predicate) {
         return cursor -> {
-            if (cursor.end()) {
-                return Collections.emptySet();
-            }
-            char c = cursor.current();
-            if ((c - c1) * (c - c2) > 0) {
+            if (cursor.end() || !predicate.test(cursor.current())) {
                 return Collections.emptySet();
             }
             return Set.of(cursor.next());
@@ -139,7 +153,7 @@ public interface Regex {
      * 连接两个Regex
      * @param rhs rhs
      */
-    default Regex concat(Regex rhs) {
+    default Regex and(Regex rhs) {
         return cursor -> {
             Set<Cursor> r = new HashSet<>();
             for (Cursor c : parse(cursor)) {
@@ -173,5 +187,21 @@ public interface Regex {
      */
     default Regex many1() {
         return repeat(1, -1);
+    }
+
+    /**
+     * 应用当前Regex，并根据解析结果生成下一个Regex
+     * @param mapper 将解析结果映射为下一个Regex
+     */
+    default Regex flatMap(Function<String, Regex> mapper) {
+        return cursor -> {
+            Set<Cursor> result = new HashSet<>();
+            parse(cursor).forEach(c -> {
+                String matchStr = cursor.input().substring(cursor.index(), c.index());
+                Regex next = mapper.apply(matchStr);
+                result.addAll(next.parse(c));
+            });
+            return result;
+        };
     }
 }
