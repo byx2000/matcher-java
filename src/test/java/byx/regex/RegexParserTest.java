@@ -8,7 +8,7 @@ import java.util.Scanner;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class RegexTest {
+public class RegexParserTest {
     @Test
     public void test1() {
         Regex r = RegexParser.parse("a");

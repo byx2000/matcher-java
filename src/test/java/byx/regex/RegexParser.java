@@ -1,5 +1,7 @@
 package byx.regex;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static byx.regex.Regex.*;
 
 /**
@@ -8,111 +10,109 @@ import static byx.regex.Regex.*;
 public class RegexParser {
     public static Regex parse(String expr) {
         try {
-            return parseExpr(new Cursor(expr, 0)).regex;
+            return parseExpr(expr, new AtomicInteger(0));
         }
         catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Unknown parse error", e);
         }
     }
 
-    private static class ParseResult {
-        private final Regex regex;
-        private final Cursor remain;
-
-        private ParseResult(Regex regex, Cursor remain) {
-            this.regex = regex;
-            this.remain = remain;
-        }
-    }
-
-    private static Cursor read(Cursor cursor, char c) {
-        if (cursor.end() || cursor.current() != c) {
+    private static void read(String expr, AtomicInteger index, char c) {
+        if (index.get() == expr.length() || expr.charAt(index.get()) != c) {
             throw new RuntimeException("expected: " + c);
         }
-        return cursor.next();
+        index.incrementAndGet();
     }
 
-    // elem = char | (expr)
-    private static ParseResult parseElem(Cursor cursor) {
-        if (cursor.current() == '(') {
-            ParseResult r = parseExpr(cursor.next());
-            return new ParseResult(r.regex, read(r.remain, ')'));
-        } else if (cursor.current() == '[') {
-            return parseRange(cursor);
-        } else if (cursor.current() == '.') {
-            return new ParseResult(any(), cursor.next());
-        } else if (cursor.current() == '\\') {
-            cursor = cursor.next();
-            return new ParseResult(ch(cursor.current()), cursor.next());
+    // expr = term ('|' term)*
+    private static Regex parseExpr(String expr, AtomicInteger index) {
+        Regex r = parseTerm(expr, index);
+        while (index.get() < expr.length() && expr.charAt(index.get()) == '|') {
+            index.incrementAndGet();
+            r = r.or(parseTerm(expr, index));
+        }
+        return r;
+    }
+
+    // term = factor+
+    private static Regex parseTerm(String expr, AtomicInteger index) {
+        Regex r = parseFactor(expr, index);
+        while (index.get() < expr.length() && expr.charAt(index.get()) != ')' && expr.charAt(index.get()) != '|') {
+            r = r.concat(parseFactor(expr, index));
+        }
+        return r;
+    }
+
+    // factor = elem '*'
+    //        | elem '+'
+    //        | elem
+    private static Regex parseFactor(String expr, AtomicInteger index) {
+        Regex r = parseElem(expr, index);
+        if (index.get() < expr.length()) {
+            if (expr.charAt(index.get()) == '*') {
+                index.incrementAndGet();
+                return r.many();
+            } else if (expr.charAt(index.get()) == '+') {
+                index.incrementAndGet();
+                return r.many1();
+            }
+        }
+        return r;
+    }
+
+    // elem = '(' expr ')'
+    //      | '[' range ']'
+    //      | '.'
+    //      | '\' char
+    //      | char
+    private static Regex parseElem(String expr, AtomicInteger index) {
+        switch (expr.charAt(index.get())) {
+            case '(' -> {
+                index.incrementAndGet();
+                Regex r = parseExpr(expr, index);
+                read(expr, index, ')');
+                return r;
+            }
+            case '[' -> {
+                index.incrementAndGet();
+                Regex r = parseRange(expr, index);
+                read(expr, index, ']');
+                return r;
+            }
+            case '.' -> {
+                index.incrementAndGet();
+                return any();
+            }
+            case '\\' -> {
+                index.incrementAndGet();
+                return ch(expr.charAt(index.getAndIncrement()));
+            }
+            default -> {
+                return ch(expr.charAt(index.getAndIncrement()));
+            }
+        }
+    }
+
+    // range = rangeItem+
+    private static Regex parseRange(String expr, AtomicInteger index) {
+        Regex r = parseRangeItem(expr, index);
+        while (index.get() < expr.length() && expr.charAt(index.get()) != ']') {
+            r = r.or(parseRangeItem(expr, index));
+        }
+        return r;
+    }
+
+    // rangeItem = char '-' char
+    //           | char
+    private static Regex parseRangeItem(String expr, AtomicInteger index) {
+        char c = expr.charAt(index.getAndIncrement());
+        if (expr.charAt(index.get()) == '-') {
+            index.incrementAndGet();
+            return range(c, expr.charAt(index.getAndIncrement()));
         } else {
-            return new ParseResult(ch(cursor.current()), cursor.next());
-        }
-    }
-
-    // factor = elem* | elem+ | elem
-    private static ParseResult parseFactor(Cursor cursor) {
-        ParseResult r = parseElem(cursor);
-        Regex regex = r.regex;
-        cursor = r.remain;
-
-        if (!cursor.end() && cursor.current() == '*') {
-            regex = regex.many();
-            cursor = cursor.next();
-        } else if (!cursor.end() && cursor.current() == '+') {
-            regex = regex.many1();
-            cursor = cursor.next();
-        }
-        return new ParseResult(regex, cursor);
-    }
-
-    // term = factor factor ... factor
-    private static ParseResult parseTerm(Cursor cursor) {
-        ParseResult r = parseFactor(cursor);
-        Regex regex = r.regex;
-        cursor = r.remain;
-        while (!cursor.end() && cursor.current() != ')' && cursor.current() != '|') {
-            ParseResult rr = parseFactor(cursor);
-            regex = regex.concat(rr.regex);
-            cursor = rr.remain;
-        }
-        return new ParseResult(regex, cursor);
-    }
-
-    // expr = term|term|...|term
-    private static ParseResult parseExpr(Cursor cursor) {
-        ParseResult r = parseTerm(cursor);
-        Regex regex = r.regex;
-        cursor = r.remain;
-        while (!cursor.end() && cursor.current() == '|') {
-            ParseResult rr = parseTerm(cursor.next());
-            regex = regex.or(rr.regex);
-            cursor = rr.remain;
-        }
-        return new ParseResult(regex, cursor);
-    }
-
-    private static ParseResult parseRange(Cursor cursor) {
-        ParseResult r = parseRangeItem(read(cursor, '['));
-        Regex regex = r.regex;
-        cursor = r.remain;
-        while (!cursor.end() && cursor.current() != ']') {
-            ParseResult rr = parseRangeItem(cursor);
-            regex = regex.or(rr.regex);
-            cursor = rr.remain;
-        }
-        return new ParseResult(regex, read(cursor, ']'));
-    }
-
-    private static ParseResult parseRangeItem(Cursor cursor) {
-        char c1 = cursor.current();
-        cursor = cursor.next();
-        if (cursor.current() == '-') {
-            char c2 = cursor.next().current();
-            return new ParseResult(range(c1, c2), cursor.next());
-        } else {
-            return new ParseResult(ch(c1), cursor);
+            return ch(c);
         }
     }
 }
