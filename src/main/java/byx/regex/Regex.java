@@ -113,37 +113,17 @@ public interface Regex {
      */
     default Regex repeat(int minTimes, int maxTimes) {
         return cursor -> {
-            Set<Cursor> results = new HashSet<>();
-            Queue<Cursor> queue = new LinkedList<>(List.of(cursor));
-
             // 消耗minTimes次
-            int times = 0;
-            while (!queue.isEmpty() && times < minTimes) {
-                int cnt = queue.size();
-                while (cnt-- > 0) {
-                    Cursor c = queue.remove();
-                    queue.addAll(parse(c));
-                }
-                times++;
+            Set<Cursor> set = new HashSet<>(List.of(cursor));
+            for (int i = 0; i < minTimes; i++) {
+                set = set.stream().flatMap(c -> parse(c).stream()).collect(Collectors.toSet());
             }
 
-            Set<Cursor> set = new HashSet<>(queue);
-            queue = new LinkedList<>(set);
-
             // 继续消耗直到maxTimes次
-            while (!queue.isEmpty() && (maxTimes < 0 || times <= maxTimes)) {
-                int cnt = queue.size();
-                while (cnt-- > 0) {
-                    Cursor c = queue.remove();
-                    results.add(c);
-                    for (Cursor cc : parse(c)) {
-                        if (!set.contains(cc)) {
-                            set.add(cc);
-                            queue.add(cc);
-                        }
-                    }
-                }
-                times++;
+            Set<Cursor> results = new HashSet<>(set);
+            for (int i = 0; i < maxTimes - minTimes; i++) {
+                set = set.stream().flatMap(c -> parse(c).stream()).collect(Collectors.toSet());
+                results.addAll(set);
             }
 
             return results;
@@ -188,14 +168,31 @@ public interface Regex {
      * 将当前Regex连续应用0次或多次
      */
     default Regex many() {
-        return repeat(0, -1);
+        return cursor -> {
+            Set<Cursor> result = new HashSet<>(Set.of(cursor));
+            Queue<Cursor> queue = new ArrayDeque<>(Set.of(cursor));
+
+            while (!queue.isEmpty()) {
+                int cnt = queue.size();
+                while (cnt-- > 0) {
+                    parse(queue.remove()).forEach(c -> {
+                        if (!result.contains(c)) {
+                            result.add(c);
+                            queue.add(c);
+                        }
+                    });
+                }
+            }
+
+            return result;
+        };
     }
 
     /**
      * 将当前Regex连续应用1次或多次
      */
     default Regex many1() {
-        return repeat(1, -1);
+        return this.and(many());
     }
 
     /**
