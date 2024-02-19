@@ -3,6 +3,7 @@ package byx.regex;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -93,6 +94,14 @@ public interface Regex {
             }
             return Set.of(cursor);
         };
+    }
+
+    /**
+     * 惰性Regex
+     * @param supplier 返回Regex的工厂函数
+     */
+    static Regex lazy(Supplier<Regex> supplier) {
+        return cursor -> supplier.get().parse(cursor);
     }
 
     /**

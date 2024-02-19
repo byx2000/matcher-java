@@ -2,6 +2,8 @@ package byx.regex;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static byx.regex.Regex.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -76,7 +78,7 @@ public class RegexCombinatorTest {
     }
 
     @Test
-    public void testConcat() {
+    public void testAnd() {
         Regex r = ch('a').and(ch('b'));
         assertTrue(r.match("ab"));
         assertFalse(r.match("a"));
@@ -167,5 +169,17 @@ public class RegexCombinatorTest {
         assertFalse(r.match("aaabbbb"));
         assertFalse(r.match("xxxxyyy"));
         assertFalse(r.match("mmm"));
+    }
+
+    @Test
+    public void testLazy() {
+        AtomicInteger i = new AtomicInteger(123);
+        Regex r = lazy(() -> {
+            i.set(456);
+            return ch('a');
+        });
+        assertEquals(123, i.get());
+        assertTrue(r.match("a"));
+        assertEquals(456, i.get());
     }
 }
