@@ -224,20 +224,28 @@ public class RegexParserTest {
 
     @Test
     public void test18() {
+        Regex r = RegexParser.parse("(((a+)+)+)+");
+        assertTrue(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+        assertFalse(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"));
+        assertFalse(r.match("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+    }
+
+    @Test
+    public void test19() {
         Regex r = RegexParser.parse("X(.+)+X");
         assertTrue(r.match("X==============================================X"));
         assertFalse(r.match("==XX=============================================="));
     }
 
     @Test
-    public void test19() {
+    public void test20() {
         Regex r = RegexParser.parse("((0|1)+)+b");
         assertFalse(r.match("10101010110101001100101010101010101010101010101010000"));
         assertTrue(r.match("10101010110101001100101010101010101010101010101010000b"));
     }
 
     @Test
-    public void test20() {
+    public void test21() {
         Regex r = RegexParser.parse("(.*)adidas(.*)");
         assertTrue(r.match("adidas"));
         assertTrue(r.match("adidasxxxxxxx"));
@@ -250,7 +258,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test21() {
+    public void test22() {
         Regex r = RegexParser.parse("[0-9]");
         assertTrue(r.match("0"));
         assertTrue(r.match("5"));
@@ -260,7 +268,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test22() {
+    public void test23() {
         Regex r = RegexParser.parse("[abc]");
         assertTrue(r.match("a"));
         assertTrue(r.match("b"));
@@ -270,7 +278,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test23() {
+    public void test24() {
         Regex r = RegexParser.parse("[a-zA-Z]");
         assertTrue(r.match("a"));
         assertTrue(r.match("x"));
@@ -284,7 +292,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test24() {
+    public void test25() {
         Regex r = RegexParser.parse("[_a-zA-Z][_0-9a-zA-Z]*");
         assertTrue(r.match("_"));
         assertTrue(r.match("_var"));
@@ -299,7 +307,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test25() {
+    public void test26() {
         // 匹配3的倍数
         Regex r = RegexParser.parse("[0369]*(([147][0369]*|[258][0369]*[258][0369]*)([147][0369]*[258][0369]*)*([258][0369]*|[147][0369]*[147][0369]*)|[258][0369]*[147][0369]*)*");
 
@@ -318,7 +326,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test26() {
+    public void test27() {
         Regex r = RegexParser.parse("\\.");
         assertTrue(r.match("."));
         assertFalse(r.match(""));
@@ -331,7 +339,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test27() {
+    public void test28() {
         Regex r = RegexParser.parse("\\**");
         assertTrue(r.match(""));
         assertTrue(r.match("*"));
@@ -348,7 +356,7 @@ public class RegexParserTest {
     }
 
     @Test
-    public void test28() {
+    public void test29() {
         Regex r = RegexParser.parse("(a*)*");
         assertTrue(r.match("a".repeat(1000)));
         assertFalse(r.match("a".repeat(1000) + "b"));

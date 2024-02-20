@@ -165,22 +165,28 @@ public interface Regex {
     }
 
     /**
-     * 将当前Regex连续应用0次或多次
+     * 将当前Regex连续应用至少minTimes次
+     * @param minTimes 最少应用次数
      */
-    default Regex many() {
+    default Regex many(int minTimes) {
         return cursor -> {
             Set<Cursor> result = new HashSet<>(Set.of(cursor));
-            Queue<Cursor> queue = new ArrayDeque<>(Set.of(cursor));
+            for (int i = 0; i < minTimes; i++) {
+                result = result.stream()
+                    .flatMap(c -> parse(c).stream())
+                    .collect(Collectors.toSet());
+            }
 
+            Queue<Cursor> queue = new ArrayDeque<>(result);
             while (!queue.isEmpty()) {
                 int cnt = queue.size();
                 while (cnt-- > 0) {
-                    parse(queue.remove()).forEach(c -> {
+                    for (Cursor c : parse(queue.remove())) {
                         if (!result.contains(c)) {
                             result.add(c);
                             queue.add(c);
                         }
-                    });
+                    }
                 }
             }
 
@@ -189,10 +195,17 @@ public interface Regex {
     }
 
     /**
+     * 将当前Regex连续应用0次或多次
+     */
+    default Regex many() {
+        return many(0);
+    }
+
+    /**
      * 将当前Regex连续应用1次或多次
      */
     default Regex many1() {
-        return this.and(many());
+        return many(1);
     }
 
     /**

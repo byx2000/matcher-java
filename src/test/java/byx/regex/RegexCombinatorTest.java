@@ -150,6 +150,17 @@ public class RegexCombinatorTest {
     }
 
     @Test
+    public void testMany2() {
+        Regex r = ch('a').many(3);
+        assertFalse(r.match(""));
+        assertFalse(r.match("a"));
+        assertFalse(r.match("aa"));
+        assertTrue(r.match("aaa"));
+        assertTrue(r.match("aaaa"));
+        assertTrue(r.match("aaaaa"));
+    }
+
+    @Test
     public void testFlatMap1() {
         Regex r = not(' ').many1().flatMap(s -> ch(' ').and(str("xxx ")).and(str(s)));
         assertTrue(r.match("m xxx m"));
