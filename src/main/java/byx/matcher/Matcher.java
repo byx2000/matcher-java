@@ -95,6 +95,12 @@ public interface Matcher {
         };
     }
 
+    /**
+     * 匹配字符串集合
+     * @param s1 s1
+     * @param s2 s2
+     * @param strs strs
+     */
     static Matcher strs(String s1, String s2, String... strs) {
         return Arrays.stream(strs).map(Matcher::str).reduce(str(s1).or(str(s2)), Matcher::or);
     }
