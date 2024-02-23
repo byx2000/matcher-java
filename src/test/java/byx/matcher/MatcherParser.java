@@ -1,14 +1,14 @@
-package byx.regex;
+package byx.matcher;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static byx.regex.Regex.*;
+import static byx.matcher.Matcher.*;
 
 /**
- * 将正则表达式字符串解析成Regex
+ * 将正则表达式字符串解析成Matcher
  */
-public class RegexParser {
-    public static Regex parse(String expr) {
+public class MatcherParser {
+    public static Matcher parse(String expr) {
         try {
             return parseExpr(expr, new AtomicInteger(0));
         } catch (RuntimeException e) {
@@ -26,39 +26,39 @@ public class RegexParser {
     }
 
     // expr = term ('|' term)*
-    private static Regex parseExpr(String expr, AtomicInteger index) {
-        Regex r = parseTerm(expr, index);
+    private static Matcher parseExpr(String expr, AtomicInteger index) {
+        Matcher m = parseTerm(expr, index);
         while (index.get() < expr.length() && expr.charAt(index.get()) == '|') {
             index.incrementAndGet();
-            r = r.or(parseTerm(expr, index));
+            m = m.or(parseTerm(expr, index));
         }
-        return r;
+        return m;
     }
 
     // term = factor+
-    private static Regex parseTerm(String expr, AtomicInteger index) {
-        Regex r = parseFactor(expr, index);
+    private static Matcher parseTerm(String expr, AtomicInteger index) {
+        Matcher m = parseFactor(expr, index);
         while (index.get() < expr.length() && expr.charAt(index.get()) != ')' && expr.charAt(index.get()) != '|') {
-            r = r.and(parseFactor(expr, index));
+            m = m.and(parseFactor(expr, index));
         }
-        return r;
+        return m;
     }
 
     // factor = elem '*'
     //        | elem '+'
     //        | elem
-    private static Regex parseFactor(String expr, AtomicInteger index) {
-        Regex r = parseElem(expr, index);
+    private static Matcher parseFactor(String expr, AtomicInteger index) {
+        Matcher m = parseElem(expr, index);
         if (index.get() < expr.length()) {
             if (expr.charAt(index.get()) == '*') {
                 index.incrementAndGet();
-                return r.many();
+                return m.many();
             } else if (expr.charAt(index.get()) == '+') {
                 index.incrementAndGet();
-                return r.many1();
+                return m.many1();
             }
         }
-        return r;
+        return m;
     }
 
     // elem = '(' expr ')'
@@ -66,19 +66,19 @@ public class RegexParser {
     //      | '.'
     //      | '\' char
     //      | char
-    private static Regex parseElem(String expr, AtomicInteger index) {
+    private static Matcher parseElem(String expr, AtomicInteger index) {
         switch (expr.charAt(index.get())) {
             case '(' -> {
                 index.incrementAndGet();
-                Regex r = parseExpr(expr, index);
+                Matcher m = parseExpr(expr, index);
                 read(expr, index, ')');
-                return r;
+                return m;
             }
             case '[' -> {
                 index.incrementAndGet();
-                Regex r = parseRange(expr, index);
+                Matcher m = parseRange(expr, index);
                 read(expr, index, ']');
-                return r;
+                return m;
             }
             case '.' -> {
                 index.incrementAndGet();
@@ -95,17 +95,17 @@ public class RegexParser {
     }
 
     // range = rangeItem+
-    private static Regex parseRange(String expr, AtomicInteger index) {
-        Regex r = parseRangeItem(expr, index);
+    private static Matcher parseRange(String expr, AtomicInteger index) {
+        Matcher m = parseRangeItem(expr, index);
         while (index.get() < expr.length() && expr.charAt(index.get()) != ']') {
-            r = r.or(parseRangeItem(expr, index));
+            m = m.or(parseRangeItem(expr, index));
         }
-        return r;
+        return m;
     }
 
     // rangeItem = char '-' char
     //           | char
-    private static Regex parseRangeItem(String expr, AtomicInteger index) {
+    private static Matcher parseRangeItem(String expr, AtomicInteger index) {
         char c = expr.charAt(index.getAndIncrement());
         if (expr.charAt(index.get()) == '-') {
             index.incrementAndGet();
