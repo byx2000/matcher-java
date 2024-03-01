@@ -1,6 +1,6 @@
-# matcher-combinator
+# matcher-java
 
-matcher-combinator是一个基于解析器组合子的字符串匹配库：
+matcher-java是一个基于解析器组合子的字符串匹配库：
 
 * 支持正则表达式的常用操作
 * 支持递归定义的语法规则，如括号匹配和算术表达式校验等
