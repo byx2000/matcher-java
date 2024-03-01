@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BracketMatcher {
     private static final Matcher term = oneOf(
         str("()"),
-        ch('(').and(lazy(() -> BracketMatcher.expr)).and(ch(')'))
+        ch('(').and(lazy(() -> BracketMatcher.expr)).and(')')
     );
     private static final Matcher expr = term.many1();
 
@@ -36,7 +36,7 @@ class ArithmeticExprValidator {
     private static final Matcher fact = oneOf(
         range('0', '9').many1(),
         ch('-').and(lazy(() -> ArithmeticExprValidator.fact)),
-        ch('(').and(lazy(() -> ArithmeticExprValidator.expr)).and(ch(')'))
+        ch('(').and(lazy(() -> ArithmeticExprValidator.expr)).and(')')
     );
     private static final Matcher term = fact.and(chs('*', '/').and(fact).many());
     private static final Matcher expr = term.and(chs('+', '-').and(term).many());

@@ -74,10 +74,11 @@ public interface Matcher {
      */
     static Matcher ch(Predicate<Character> predicate) {
         return (s, index) -> {
-            if (index == s.length() || !predicate.test(s.charAt(index))) {
+            if (index < s.length() && predicate.test(s.charAt(index))) {
+                return Set.of(index + 1);
+            } else {
                 return Collections.emptySet();
             }
-            return Set.of(index + 1);
         };
     }
 
@@ -186,6 +187,22 @@ public interface Matcher {
     }
 
     /**
+     * 将c转换成Matcher再与当前Matcher连接
+     * @param c c
+     */
+    default Matcher and(char c) {
+        return and(ch(c));
+    }
+
+    /**
+     * 将s转换成Matcher再与当前Matcher连接
+     * @param s s
+     */
+    default Matcher and(String s) {
+        return and(str(s));
+    }
+
+    /**
      * 使用or连接两个Matcher
      * @param rhs rhs
      */
@@ -195,6 +212,22 @@ public interface Matcher {
             result.addAll(rhs.parse(s, index));
             return result;
         };
+    }
+
+    /**
+     * 将c转换成Matcher再与当前Matcher使用or连接
+     * @param c c
+     */
+    default Matcher or(char c) {
+        return or(ch(c));
+    }
+
+    /**
+     * 将s转换成Matcher再与当前Matcher使用or连接
+     * @param s s
+     */
+    default Matcher or(String s) {
+        return or(str(s));
     }
 
     /**

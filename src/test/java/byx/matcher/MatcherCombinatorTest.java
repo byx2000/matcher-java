@@ -77,7 +77,7 @@ public class MatcherCombinatorTest {
     }
 
     @Test
-    public void testAnd() {
+    public void testAnd1() {
         Matcher m = ch('a').and(ch('b'));
         assertTrue(m.match("ab"));
         assertFalse(m.match("a"));
@@ -89,8 +89,56 @@ public class MatcherCombinatorTest {
     }
 
     @Test
-    public void testOr() {
+    public void testAnd2() {
+        Matcher m = ch('a').and('b');
+        assertTrue(m.match("ab"));
+        assertFalse(m.match("a"));
+        assertFalse(m.match("abc"));
+        assertFalse(m.match("ba"));
+        assertFalse(m.match("x"));
+        assertFalse(m.match("xy"));
+        assertFalse(m.match(""));
+    }
+
+    @Test
+    public void testAnd3() {
+        Matcher m = ch('a').and("b");
+        assertTrue(m.match("ab"));
+        assertFalse(m.match("a"));
+        assertFalse(m.match("abc"));
+        assertFalse(m.match("ba"));
+        assertFalse(m.match("x"));
+        assertFalse(m.match("xy"));
+        assertFalse(m.match(""));
+    }
+
+    @Test
+    public void testOr1() {
         Matcher m = ch('a').or(ch('b'));
+        assertTrue(m.match("a"));
+        assertTrue(m.match("b"));
+        assertFalse(m.match("x"));
+        assertFalse(m.match("ax"));
+        assertFalse(m.match("by"));
+        assertFalse(m.match("mn"));
+        assertFalse(m.match(""));
+    }
+
+    @Test
+    public void testOr2() {
+        Matcher m = ch('a').or('b');
+        assertTrue(m.match("a"));
+        assertTrue(m.match("b"));
+        assertFalse(m.match("x"));
+        assertFalse(m.match("ax"));
+        assertFalse(m.match("by"));
+        assertFalse(m.match("mn"));
+        assertFalse(m.match(""));
+    }
+
+    @Test
+    public void testOr3() {
+        Matcher m = ch('a').or("b");
         assertTrue(m.match("a"));
         assertTrue(m.match("b"));
         assertFalse(m.match("x"));
