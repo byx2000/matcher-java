@@ -9,7 +9,7 @@ matcher-java是一个基于解析器组合子的字符串匹配库：
 
 ```java
 // a(mn|xy)[0-9]+
-Matcher m = ch('a').and(str("mn").or(str("xy"))).and(range('0', '9').many1());
+Matcher m = ch('a').and(str("mn").or("xy")).and(range('0', '9').many1());
 
 System.out.println(m.match("amn12345")); // true
 System.out.println(m.match("axy123")); // true
@@ -29,7 +29,7 @@ System.out.println(m.match("amnxy")); // false
 public class BracketMatcher {
     private static final Matcher term = oneOf(
         str("()"),
-        ch('(').and(lazy(() -> BracketMatcher.expr)).and(ch(')'))
+        ch('(').and(lazy(() -> BracketMatcher.expr)).and(')')
     );
     private static final Matcher expr = term.many1();
 
@@ -57,7 +57,7 @@ public class ArithmeticExprValidator {
     private static final Matcher fact = oneOf(
         range('0', '9').many1(),
         ch('-').and(lazy(() -> ArithmeticExprValidator.fact)),
-        ch('(').and(lazy(() -> ArithmeticExprValidator.expr)).and(ch(')'))
+        ch('(').and(lazy(() -> ArithmeticExprValidator.expr)).and(')')
     );
     private static final Matcher term = fact.and(chs('*', '/').and(fact).many());
     private static final Matcher expr = term.and(chs('+', '-').and(term).many());
