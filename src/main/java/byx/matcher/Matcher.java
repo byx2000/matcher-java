@@ -246,13 +246,10 @@ public interface Matcher {
             Queue<Integer> queue = new ArrayDeque<>(set);
             Set<Integer> result = new HashSet<>(set);
             while (!queue.isEmpty()) {
-                int cnt = queue.size();
-                while (cnt-- > 0) {
-                    for (int i : parse(s, queue.remove())) {
-                        if (!result.contains(i)) {
-                            result.add(i);
-                            queue.add(i);
-                        }
+                for (int i : parse(s, queue.remove())) {
+                    if (!result.contains(i)) {
+                        result.add(i);
+                        queue.add(i);
                     }
                 }
             }
