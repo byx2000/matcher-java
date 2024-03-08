@@ -40,7 +40,7 @@ public class MatcherCombinatorTest {
 
     @Test
     public void testAny() {
-        Matcher m = any();
+        Matcher m = any;
         assertTrue(m.match("a"));
         assertTrue(m.match("b"));
         assertFalse(m.match(""));
@@ -220,7 +220,7 @@ public class MatcherCombinatorTest {
 
     @Test
     public void testFlatMap2() {
-        Matcher m = any().many1().flatMap(s -> any().repeat(s.length()));
+        Matcher m = any.many1().flatMap(s -> any.repeat(s.length()));
         assertTrue(m.match("aaabbb"));
         assertTrue(m.match("aaaabbbb"));
         assertTrue(m.match("xxxxxyyyyy"));

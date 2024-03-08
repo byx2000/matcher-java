@@ -82,7 +82,7 @@ public class MatcherParser {
             }
             case '.' -> {
                 index.incrementAndGet();
-                return any();
+                return any;
             }
             case '\\' -> {
                 index.incrementAndGet();

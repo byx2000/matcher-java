@@ -30,9 +30,7 @@ public interface Matcher {
     /**
      * 匹配任意单个字符
      */
-    static Matcher any() {
-        return ch(c -> true);
-    }
+    Matcher any = ch(c -> true);
 
     /**
      * 匹配单个指定字符c
