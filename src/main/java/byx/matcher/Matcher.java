@@ -134,14 +134,12 @@ public interface Matcher {
 
     /**
      * 将当前Matcher连续应用多次，最少应用minTimes次，最多应用maxTimes次
-     * <p>minTimes=-1表示可以应用0次</p>
-     * <p>maxTimes=-1表示应用次数无上限</p>
      * @param minTimes minTimes
      * @param maxTimes maxTimes
      */
     default Matcher repeat(int minTimes, int maxTimes) {
         return (s, index) -> {
-            // 消耗minTimes次
+            // 应用minTimes次
             Set<Integer> set = Set.of(index);
             for (int i = 0; i < minTimes; i++) {
                 set = set.stream()
@@ -149,16 +147,24 @@ public interface Matcher {
                     .collect(Collectors.toSet());
             }
 
-            // 继续消耗直到maxTimes次
-            Set<Integer> results = new HashSet<>(set);
-            for (int i = 0; i < maxTimes - minTimes; i++) {
-                set = set.stream()
-                    .flatMap(idx -> parse(s, idx).stream())
-                    .collect(Collectors.toSet());
-                results.addAll(set);
+            // 继续应用直到maxTimes次
+            Set<Integer> result = new HashSet<>(set);
+            Queue<Integer> queue = new ArrayDeque<>(set);
+            int times = minTimes;
+            while (!queue.isEmpty() && times < maxTimes) {
+                int cnt = queue.size();
+                while (cnt-- > 0) {
+                    for (int i : parse(s, queue.remove())) {
+                        if (!result.contains(i)) {
+                            result.add(i);
+                            queue.add(i);
+                        }
+                    }
+                }
+                times++;
             }
 
-            return results;
+            return result;
         };
     }
 
@@ -234,6 +240,7 @@ public interface Matcher {
      */
     default Matcher many(int minTimes) {
         return (s, index) -> {
+            // 应用minTimes次
             Set<Integer> set = Set.of(index);
             for (int i = 0; i < minTimes; i++) {
                 set = set.stream()

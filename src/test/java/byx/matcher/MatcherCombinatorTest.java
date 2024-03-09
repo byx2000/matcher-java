@@ -173,6 +173,15 @@ public class MatcherCombinatorTest {
     }
 
     @Test
+    public void testRepeat3() {
+        Matcher m = ch('a').repeat(3, Integer.MAX_VALUE);
+        assertTrue(m.match("aaa"));
+        assertTrue(m.match("aaaa"));
+        assertTrue(m.match("a".repeat(1000)));
+        assertFalse(m.match("aa"));
+    }
+
+    @Test
     public void testMany() {
         Matcher m = ch('a').many();
         assertTrue(m.match(""));
